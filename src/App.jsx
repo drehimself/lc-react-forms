@@ -1,47 +1,42 @@
-import { useState } from 'react';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 import './App.css';
 
 function App() {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [passwordConfirm, setPasswordConfirm] = useState('');
+  const formik = useFormik({
+    initialValues: {
+      name: '',
+      email: '',
+      password: '',
+      passwordConfirm: '',
+    },
+    validationSchema: Yup.object({
+      name: Yup.string()
+        .min(3, 'Name must be at least 3 characters')
+        .required('Name is required'),
+      email: Yup.string()
+        .email('Invalid email address')
+        .required('Email is required'),
+      password: Yup.string()
+        .min(5, 'Password must be at least 5 characters')
+        .required('Password is required'),
+      passwordConfirm: Yup.string()
+        .oneOf([Yup.ref('password')], 'Your passwords do not match')
+        .required('Password Confirm is required'),
+    }),
+    onSubmit: (values, { resetForm }) => {
+      alert(JSON.stringify(values, null, 2));
+      resetForm();
+    },
+  });
 
-  function submitForm(e) {
-    e.preventDefault();
-
-    // Validation
-    if (!name) {
-      alert('Please enter your name');
-      return;
-    }
-
-    if (!email) {
-      alert('Please enter your email');
-      return;
-    }
-
-    if (!password) {
-      alert('Please enter your password');
-      return;
-    }
-
-    if (password !== passwordConfirm) {
-      alert('Passwords do not match');
-      return;
-    }
-
-    // Register
-    alert(
-      `Register with Name: ${name}, Email: ${email}, Password: ${password}`
-    );
-  }
+  // console.log(formik.touched);
 
   return (
     <div className="container">
       <div className="form-container shadow">
         <h2>Register</h2>
-        <form action="#" onSubmit={submitForm} autoComplete="off">
+        <form action="#" onSubmit={formik.handleSubmit} autoComplete="off">
           <div className="form-field">
             <label htmlFor="name">Name</label>
             <input
@@ -49,9 +44,14 @@ function App() {
               name="name"
               id="name"
               placeholder="Your name"
-              value={name}
-              onChange={e => setName(e.target.value)}
+              {...formik.getFieldProps('name')}
+              // value={formik.values.name}
+              // onChange={formik.handleChange}
+              // onBlur={formik.handleBlur}
             />
+            {formik.errors.name && formik.touched.name ? (
+              <div className="error">{formik.errors.name}</div>
+            ) : null}
           </div>
           <div className="form-field">
             <label htmlFor="email">Email</label>
@@ -60,9 +60,14 @@ function App() {
               name="email"
               id="email"
               placeholder="Your email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
+              {...formik.getFieldProps('email')}
+              // value={formik.values.email}
+              // onChange={formik.handleChange}
+              // onBlur={formik.handleBlur}
             />
+            {formik.errors.email && formik.touched.email ? (
+              <div className="error">{formik.errors.email}</div>
+            ) : null}
           </div>
           <div className="form-field">
             <label htmlFor="password">Password</label>
@@ -71,9 +76,14 @@ function App() {
               name="password"
               id="password"
               placeholder="Your password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
+              {...formik.getFieldProps('password')}
+              // value={formik.values.password}
+              // onChange={formik.handleChange}
+              // onBlur={formik.handleBlur}
             />
+            {formik.errors.password && formik.touched.password ? (
+              <div className="error">{formik.errors.password}</div>
+            ) : null}
           </div>
           <div className="form-field">
             <label htmlFor="passwordConfirm">Password Confirm</label>
@@ -82,9 +92,14 @@ function App() {
               name="passwordConfirm"
               id="passwordConfirm"
               placeholder="Confirm password"
-              value={passwordConfirm}
-              onChange={e => setPasswordConfirm(e.target.value)}
+              {...formik.getFieldProps('passwordConfirm')}
+              // value={formik.values.passwordConfirm}
+              // onChange={formik.handleChange}
+              // onBlur={formik.handleBlur}
             />
+            {formik.errors.passwordConfirm && formik.touched.passwordConfirm ? (
+              <div className="error">{formik.errors.passwordConfirm}</div>
+            ) : null}
           </div>
           <div className="button-container">
             <button type="submit" className="button">
